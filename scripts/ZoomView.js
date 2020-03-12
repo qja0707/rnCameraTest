@@ -17,6 +17,7 @@ export default class ZoomView extends Component {
       
 
       onPanResponderMove: (e, {dy}) => {
+        console.log("this is native event : ", e.nativeEvent)
         const {height: windowHeight} = Dimensions.get('window');
         console.log('asdfasdf');
         return this.props.onZoomProgress(

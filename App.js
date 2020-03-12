@@ -69,7 +69,7 @@ export default class App extends React.Component {
       <View style={styles.container}>
         <ZoomView
           onZoomProgress={progress => {
-            console.log("zoom : ", progress)
+            console.log('zoom : ', progress);
             this.setState({zoom: progress});
           }}
           onZoomStart={() => {
@@ -78,36 +78,53 @@ export default class App extends React.Component {
           onZoomEnd={() => {
             console.log('zoom end');
           }}>
-          
-            <RNCamera
-              ref={ref => {
-                this.camera = ref;
-              }}
-              style={styles.preview}
-              type={RNCamera.Constants.Type.back}
-              flashMode={RNCamera.Constants.FlashMode.on}
-              androidCameraPermissionOptions={{
-                title: 'Permission to use camera',
-                message: 'We need your permission to use your camera',
-                buttonPositive: 'Ok',
-                buttonNegative: 'Cancel',
-              }}
-              androidRecordAudioPermissionOptions={{
-                title: 'Permission to use audio recording',
-                message: 'We need your permission to use your audio',
-                buttonPositive: 'Ok',
-                buttonNegative: 'Cancel',
-              }}
-              zoom={this.state.zoom}
-            />
-          
-            {/* <RNCamera style={{position:"absolute", flex:1,width:"100%"}}/> */}
-            <View style={{position:"absolute", flex:1, width:500,height:500, backgroundColor:"transparent"}}>
-            {/* <Text style={{fontSize:this.state.zoom*100}}>abcde</Text> */}
-            
+          <RNCamera
+            ref={ref => {
+              this.camera = ref;
+            }}
+            style={styles.preview}
+            type={RNCamera.Constants.Type.back}
+            flashMode={RNCamera.Constants.FlashMode.on}
+            androidCameraPermissionOptions={{
+              title: 'Permission to use camera',
+              message: 'We need your permission to use your camera',
+              buttonPositive: 'Ok',
+              buttonNegative: 'Cancel',
+            }}
+            androidRecordAudioPermissionOptions={{
+              title: 'Permission to use audio recording',
+              message: 'We need your permission to use your audio',
+              buttonPositive: 'Ok',
+              buttonNegative: 'Cancel',
+            }}
+            zoom={this.state.zoom}>
+            <View style={styles.gridLine}>
+              <View style={styles.gridLine} />
+              <View style={styles.gridLine} />
+              <View style={styles.gridLine} />
             </View>
+            <View style={styles.gridLine}>
+              <View style={styles.gridLine} />
+              <View style={styles.gridLine} />
+              <View style={styles.gridLine} />
+            </View>
+            <View style={styles.gridLine}>
+              <View style={styles.gridLine} />
+              <View style={styles.gridLine} />
+              <View style={styles.gridLine} />
+            </View>
+          </RNCamera>
+
+          {/* child component 로 RNCamera 가 있을 시 제스쳐가 제대로 전달이 안되어서 투명한 뷰로 위를 덮어 씌움 */}
+          <View
+            style={{
+              position: 'absolute',
+              flex: 1,
+              width: 500,
+              height: 500,
+              backgroundColor: 'transparent',
+            }}></View>
         </ZoomView>
-        
 
         <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center'}}>
           <TouchableOpacity onPress={this.takeVideo} style={styles.capture}>
@@ -126,7 +143,7 @@ export default class App extends React.Component {
 
   merge = async () => {
     // RNFFmpeg.execute('-i file1.mp4 -c:v mpeg4 file2.mp4').then(result => console.log("FFmpeg process exited with rc " + result.rc));
-    // ffmpeg -i "concat:input1.mp4 | input2.mp4|input3.mp4" -c copy output.mp4
+
     // await RNFFmpeg.execute('-i "" -c copy output.mp4')
 
     console.log('video files:', videoFiles);
@@ -136,15 +153,15 @@ export default class App extends React.Component {
       if (videoFiles.length > 0) {
         // let executeString = `concat:${videoFiles[0]}`;
         let appendResult;
-
+        //합치려는 파일들의 이름을 명시한 텍스트 파일이 필요
         let fileExist = await RNFS.exists(
           `${RNFS.DocumentDirectoryPath}/file.txt`,
         );
-
+        // 만약 이미 해당 파일이 있다면 지우고 시작
         if (fileExist) {
           RNFS.unlink(`${RNFS.DocumentDirectoryPath}/file.txt`);
         }
-
+        //찍어놓은 파일 이름들을 다 텍스트파일에 적기
         for (let n = 0; n < videoFiles.length; n++) {
           try {
             appendResult = await RNFS.appendFile(
@@ -163,7 +180,7 @@ export default class App extends React.Component {
         console.log('readFile : ', readFile);
 
         console.log('append result :', appendResult);
-
+        //-safe 0: 파일 이름이 unsafe 해도 상관 없음. 과 절대 경로를 사용, -y : 같은 이름의 파일이 있으면 overwrite, -n : 같은 이름의 파일이 있으면 그냥 종료
         let ffmepgExecution = `-f concat -safe 0 -i file://${RNFS.DocumentDirectoryPath}/file.txt -y -c copy ${RNFS.DocumentDirectoryPath}/output.mp4`;
 
         console.log('execute string:', ffmepgExecution);
@@ -172,9 +189,10 @@ export default class App extends React.Component {
 
         console.log('ffmpeg result : ', ffmpegResult);
 
+        //해당 파일을 갤러리에 저장
         CameraRoll.saveToCameraRoll(`${RNFS.DocumentDirectoryPath}/output.mp4`);
 
-        // CameraRoll.saveToCameraRoll()
+        // 가지고 있던 비디오 파일 리스트 초기화
         videoFiles.length = 0;
       } else {
         console.log('no video file');
@@ -241,5 +259,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignSelf: 'center',
     margin: 20,
+  },
+  gridLine: {
+    flex: 1,
+    flexDirection: 'row',
+    borderWidth: 0.2,
+    borderColor: 'white',
   },
 });
