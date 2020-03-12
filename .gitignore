@@ -57,3 +57,6 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
+ios/rnCameraTest.xcodeproj/project.pbxproj
+ios/Podfile.lock
+ios/rnCameraTest.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist

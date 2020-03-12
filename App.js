@@ -16,6 +16,7 @@ import {
   StatusBar,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Platform,
 } from 'react-native';
 
 import {
@@ -116,14 +117,14 @@ export default class App extends React.Component {
           </RNCamera>
 
           {/* child component 로 RNCamera 가 있을 시 제스쳐가 제대로 전달이 안되어서 투명한 뷰로 위를 덮어 씌움 */}
-          <View
+          {/* <View
             style={{
               position: 'absolute',
               flex: 1,
               width: 500,
               height: 500,
               backgroundColor: 'transparent',
-            }}></View>
+            }}></View> */}
         </ZoomView>
 
         <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center'}}>
@@ -212,9 +213,13 @@ export default class App extends React.Component {
   takeVideo = async () => {
     if (this.camera) {
       try {
-        request(PERMISSIONS.ANDROID.CAMERA);
-        request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
-        request(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE);
+        //ios 의 경우 plist 에 camera, microphone, photo library usage 추가해주어야 함.
+        if (Platform.OS === 'android') {
+          request(PERMISSIONS.ANDROID.CAMERA);
+          request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
+          request(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE);
+        }
+
         if (this.state.isRecording == true) {
           this.camera.stopRecording();
         } else {
