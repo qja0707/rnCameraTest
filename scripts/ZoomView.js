@@ -10,13 +10,15 @@ import {
 export default class ZoomView extends Component {
   constructor(props) {
     super(props);
-    this._panResponder = PanResponder.create({
+    this.touchNum = 0;
+    this._panResponder = PanResponder.create({      
       onStartShouldSetPanResponder: (evt, gestureState) => true,
       
       onMoveShouldSetPanResponder: (evt, gestureState) => true,
       
 
       onPanResponderMove: (e, {dy}) => {
+        this.touchNum = e.nativeEvent.touches.length;
         console.log("this is native event : ", e.nativeEvent)
         const {height: windowHeight} = Dimensions.get('window');
         console.log('asdfasdf');
@@ -31,8 +33,12 @@ export default class ZoomView extends Component {
       onPanResponderGrant: () => {
         return this.props.onZoomStart();
       },
-      onPanResponderRelease: () => {
-        return this.props.onZoomEnd();
+      onPanResponderRelease: (e, gestureState) => {
+        let focusCor = {x:0.5, y:0.5}
+        if(this.touchNum == 1){
+          focusCor = {x:gestureState.x0, y:gestureState.y0}
+        }
+        return this.props.onZoomEnd(focusCor);
       },
     });
   }  

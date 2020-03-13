@@ -57,12 +57,14 @@ export default class App extends React.Component {
       recordOptions: {
         mute: false,
         maxDuration: 15,
-        quality: RNCamera.Constants.VideoQuality['288p'],
+        // quality: RNCamera.Constants.VideoQuality['1080p'],
+        quality: RNCamera.Constants.VideoQuality['720p'],
         // path:"rnCameraTest",
       },
       isRecording: false,
       isPause: false,
       zoom: 0,
+      autoFocus: {x: 0.5, y: 0.5},
     };
   }
   render() {
@@ -76,10 +78,16 @@ export default class App extends React.Component {
           onZoomStart={() => {
             console.log('zoom start');
           }}
-          onZoomEnd={() => {
-            console.log('zoom end');
+          onZoomEnd={focusCor => {
+            console.log('zoom end : ', focusCor);
+            this.setState({autoFocus: focusCor});
           }}>
           <RNCamera
+            onLayout={event => {
+              console.log(
+                `width : ${event.nativeEvent.layout.width}, height: ${event.nativeEvent.layout.height}`,
+              );
+            }}
             ref={ref => {
               this.camera = ref;
             }}
@@ -98,7 +106,9 @@ export default class App extends React.Component {
               buttonPositive: 'Ok',
               buttonNegative: 'Cancel',
             }}
-            zoom={this.state.zoom}>
+            zoom={this.state.zoom}
+            autoFocus={RNCamera.Constants.AutoFocus.off}
+            autoFocusPointOfInterest={this.state.autoFocus}>
             <View style={styles.gridLine}>
               <View style={styles.gridLine} />
               <View style={styles.gridLine} />
